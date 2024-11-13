@@ -9,7 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { WorkoutLog } from './entities/workout-log.entity';
 import { Workout } from 'src/workout/entities/workout.entity';
-import { MailerService } from '@nestjs-modules/mailer';
+import { MailService } from 'src/mail/mail.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class WorkoutLogService {
@@ -17,10 +18,10 @@ export class WorkoutLogService {
     @InjectRepository(WorkoutLog)
     private workoutLogRepo: Repository<WorkoutLog>,
     @InjectRepository(Workout) private workoutRepo: Repository<Workout>,
-    private readonly mailService: MailerService,
+    private mailService: MailService,
   ) {}
 
-  async create(createWorkoutLogDto: CreateWorkoutLogDto) {
+  async create(createWorkoutLogDto: CreateWorkoutLogDto, user: User) {
     const workout = await this.workoutRepo.findOne({
       where: { id: createWorkoutLogDto.workoutId },
     });
@@ -28,6 +29,8 @@ export class WorkoutLogService {
     const workoutLog = this.workoutLogRepo.create(createWorkoutLogDto);
 
     workoutLog.workout = workout;
+
+    workoutLog.user = user;
 
     return await this.workoutLogRepo.save(workoutLog);
   }
@@ -51,14 +54,14 @@ export class WorkoutLogService {
 
     if (updateWorkoutLogDto.progress && updateWorkoutLogDto.progress === 100) {
       const message = `Way to go man!!!, you have completed your workout!`;
+      updateWorkoutLogDto.status = 'done';
 
       try {
-        await this.mailService.sendMail({
-          from: 'Computer Minna <computerminna@gmail.com>',
-          to: 'esehtony123@gmail.com',
-          subject: 'Completed your workout',
-          text: message,
-        });
+        await this.mailService.sendEmail(
+          'esehtony123@gmail.com',
+          'Congrats!!! Finished A Workout',
+          message,
+        );
       } catch (error) {
         console.log(error);
       }
@@ -73,7 +76,7 @@ export class WorkoutLogService {
     return this.workoutLogRepo.delete(id);
   }
 
-  async scheduleWorkOut(createWorkoutLogDto: CreateWorkoutLogDto) {
+  async scheduleWorkOut(createWorkoutLogDto: CreateWorkoutLogDto, user: User) {
     console.log(+new Date(createWorkoutLogDto.startTime) - +new Date());
     if (+new Date(createWorkoutLogDto.startTime) - +new Date() <= 0)
       throw new BadRequestException('Start time is invalid');
@@ -87,6 +90,7 @@ export class WorkoutLogService {
     const workoutLog = this.workoutLogRepo.create(createWorkoutLogDto);
 
     workoutLog.workout = workout;
+    workoutLog.user = user;
 
     return await this.workoutLogRepo.save(workoutLog);
   }

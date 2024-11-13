@@ -8,8 +8,8 @@ import { WorkoutModule } from './workout/workout.module';
 import { WorkoutLogModule } from './workout-log/workout-log.module';
 import { CommentsModule } from './comments/comments.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -19,27 +19,16 @@ import { ConfigModule } from '@nestjs/config';
     WorkoutModule,
     WorkoutLogModule,
     CommentsModule,
+    MailModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'workoutDB.sqlite',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    MailerModule.forRoot({
-      transport: {
-        host: process.env.EMAIL_HOST,
-        service: 'Gmail',
-        port: 465,
-        secure: false,
-        auth: {
-          user: process.env.EMAIL_USERNAME,
-          pass: process.env.EMAIL_PASSWORD,
-        }
-      }
-    }),
-    ConfigModule.forRoot({envFilePath: '.env', isGlobal: true})
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ConfigService],
 })
 export class AppModule {}

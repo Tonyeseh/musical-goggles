@@ -4,9 +4,10 @@ import { WorkoutLogController } from './workout-log.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkoutLog } from './entities/workout-log.entity';
 import { Workout } from 'src/workout/entities/workout.entity';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WorkoutLog, Workout])],
+  imports: [TypeOrmModule.forFeature([WorkoutLog, Workout]), MailModule],
   controllers: [WorkoutLogController],
   providers: [WorkoutLogService],
 })

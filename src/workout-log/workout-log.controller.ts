@@ -8,18 +8,23 @@ import {
   Delete,
   ValidationPipe,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
 import { WorkoutLogService } from './workout-log.service';
 import { CreateWorkoutLogDto } from './dto/create-workout-log.dto';
 import { UpdateWorkoutLogDto } from './dto/update-workout-log.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('logs')
 export class WorkoutLogController {
   constructor(private readonly workoutLogService: WorkoutLogService) {}
 
   @Post()
-  create(@Body(ValidationPipe) createWorkoutLogDto: CreateWorkoutLogDto) {
-    return this.workoutLogService.create(createWorkoutLogDto);
+  create(
+    @Req() req: Request,
+    @Body(ValidationPipe) createWorkoutLogDto: CreateWorkoutLogDto,
+  ) {
+    return this.workoutLogService.create(createWorkoutLogDto, req['user']);
   }
 
   @Get()
@@ -47,8 +52,12 @@ export class WorkoutLogController {
 
   @Post('/schedule')
   scheduleWorkOut(
+    @Req() req: Request,
     @Body(ValidationPipe) createWorkoutLogDto: CreateWorkoutLogDto,
   ) {
-    return this.workoutLogService.scheduleWorkOut(createWorkoutLogDto);
+    return this.workoutLogService.scheduleWorkOut(
+      createWorkoutLogDto,
+      req['user'],
+    );
   }
 }

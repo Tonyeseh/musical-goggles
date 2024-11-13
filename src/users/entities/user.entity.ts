@@ -3,6 +3,7 @@ import { WorkoutLog } from 'src/workout-log/entities/workout-log.entity';
 import { Workout } from 'src/workout/entities/workout.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   OneToMany,
@@ -22,6 +23,21 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({ default: false })
+  confirmedEmail: boolean;
+
+  @CreateDateColumn()
+  createdAt: string;
+
+  @CreateDateColumn()
+  updatedAt: string;
+
+  @Column({ nullable: true })
+  confirmedAt: string;
+
+  @Column({ nullable: true })
+  resetPasswordKey: string;
 
   @OneToMany(() => Workout, (workout) => workout.creator)
   @JoinColumn()

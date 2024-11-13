@@ -13,6 +13,7 @@ import {
 import { ExerciseService } from './exercise.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('exercises')
 export class ExerciseController {
@@ -23,11 +24,13 @@ export class ExerciseController {
     return this.exerciseService.create(createExerciseDto);
   }
 
+  @Public()
   @Get()
   findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
     return this.exerciseService.findAll(+page, +limit);
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.exerciseService.findOne(id);

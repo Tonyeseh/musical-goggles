@@ -7,6 +7,9 @@ export class CreateExerciseDto {
   @IsString({ message: 'Description should be a string' })
   description: string;
 
-  @IsEnum(['cardio', 'strength', 'flexibility'])
+  @IsEnum(['cardio', 'strength', 'flexibility'], {
+    message:
+      'Category must be one of the following strength, cardio or flexibility',
+  })
   category: string;
 }
